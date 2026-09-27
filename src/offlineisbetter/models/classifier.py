@@ -17,7 +17,7 @@ class ClassificationModel(nn.Module):
         of `N` nonexclusive classes.
     """
 
-    def __init__(self, encoder, num_classes, lora):
+    def __init__(self, encoder, num_classes):
         """
         Initialize this classification model.
         """
