@@ -1,0 +1,23 @@
+##############
+# .GITIGNORE #
+##############
+
+# Python-generated files
+**/__pycache__
+**/*.py[oc]
+**/build
+**/dist
+**/wheels
+**/*.egg-info
+
+# Virtual environments
+**/.venv
+
+# Model lists
+**/*.toml
+
+# Model checkpoints
+**/checkpoints
+
+# Training data
+**/data
