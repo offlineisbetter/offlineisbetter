@@ -3,7 +3,6 @@
 #
 # Classifier Model
 
-from peft import get_peft_model
 import torch
 from torch import nn
 
@@ -24,8 +23,8 @@ class ClassificationModel(nn.Module):
         """
         super().__init__()
 
-        # Get text encoder
-        self.encoder = get_peft_model(encoder.lfm2, lora)
+        # Text encoder
+        self.encoder = encoder
 
         # Construct output head
         self.head = nn.Linear(
