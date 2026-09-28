@@ -4,7 +4,9 @@
 # Classifier Model
 
 import json
+import shutil
 
+from huggingface_hub import hf_hub_download
 import torch
 from torch import nn
 from transformers import AutoTokenizer, AutoModel
@@ -73,7 +75,7 @@ class ClassificationModel(nn.Module):
             "logits": logits,
         }
 
-    def save(self, output_dir, classes):
+    def save(self, output_dir, classes, base_model_hf_name):
         """
         Save this model.
         """
@@ -85,6 +87,13 @@ class ClassificationModel(nn.Module):
             output_dir,
             safe_serialization=True,
         )
+
+        # Save modeling_lfm2_bidirectional.py
+        src = hf_hub_download(
+            repo_id = base_model_hf_name,
+            filename = "modeling_lfm2_bidirectional.py",
+        )
+        shutil.copy(src, output_dir / "modeling_lfm2_bidirectional.py")
 
         # Save classifier head
         torch.save(
