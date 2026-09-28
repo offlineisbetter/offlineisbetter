@@ -48,11 +48,6 @@ class ClassificationModel(nn.Module):
         Compute the forward pass of this model, and return
             the loss if labels are specified.
         """
-        input_ids, attention_mask = (
-            torch.tensor(input_ids),
-            torch.tensor(attention_mask),
-        )
-
         # Compute hidden state
         outputs = self.encoder(
             input_ids=input_ids,
