@@ -93,7 +93,7 @@ class ClassificationModel(nn.Module):
         )
 
         # Save classes
-        with open(output_dir / CLASSES_JSON) as f:
+        with open(output_dir / CLASSES_JSON, "r") as f:
             json.dump(classes, f)
 
     def load(self, output_dir):
@@ -110,5 +110,5 @@ class ClassificationModel(nn.Module):
         self.head.load(torch.load_state_dict(output_dir / HEAD_PT))
 
         # Load classes
-        with open(output_dir / CLASSES_JSON) as f:
+        with open(output_dir / CLASSES_JSON, "r") as f:
             self.classes = json.load(f)
