@@ -133,4 +133,4 @@ class ClassificationModel(nn.Module):
             trust_remote_code=True,
         )
 
-        return model, tokenizer
+        return model, tokenizer, classes
