@@ -7,7 +7,7 @@ import json
 
 import torch
 from torch import nn
-from transformers import AutoTokenizer, AutoModelForMaskedLM
+from transformers import AutoTokenizer, AutoModel
 
 # Classifier head file
 HEAD_PT = "classifier_head.pt"
@@ -102,7 +102,7 @@ class ClassificationModel(nn.Module):
         Load this model from its checkpoint.
         """
         # Load finetuned model
-        encoder = AutoModelForMaskedLM.from_pretrained(
+        encoder = AutoModel.from_pretrained(
             output_dir,
             local_files_only=True,
             trust_remote_code=True,
