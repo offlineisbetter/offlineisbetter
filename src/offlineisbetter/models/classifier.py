@@ -7,7 +7,7 @@ import json
 
 import torch
 from torch import nn
-from transformers import AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForMaskedLM
 
 # Classifier head file
 HEAD_PT = "classifier_head.pt"
@@ -96,19 +96,32 @@ class ClassificationModel(nn.Module):
         with open(output_dir / CLASSES_JSON, "w") as f:
             json.dump(classes, f)
 
-    def load(self, output_dir):
+    @classmethod
+    def load(cls, output_dir):
         """
         Load this model from its checkpoint.
         """
         # Load finetuned model
-        self.encoder = AutoModelForCausalLM.from_pretrained(
+        encoder = AutoModelForMaskedLM.from_pretrained(
             output_dir,
             local_files_only=True,
+            trust_remote_code=True,
         )
-
-        # Load classifier head
-        self.head.load(torch.load_state_dict(output_dir / HEAD_PT))
 
         # Load classes
         with open(output_dir / CLASSES_JSON, "r") as f:
-            self.classes = json.load(f)
+            classes = json.load(f)
+
+        model = ClassificationModel(encoder, len(classes))
+
+        # Load classifier head
+        model.head.load_state_dict(torch.load(output_dir / HEAD_PT))
+
+        # Load tokenizer
+        tokenizer = AutoTokenizer.from_pretrained(
+            output_dir,
+            local_files_only=True,
+            trust_remote_code=True,
+        )
+
+        return model, tokenizer
