@@ -1,10 +1,14 @@
-# Keep It Local
+# offlineisbetter
 # Copyright (c) 2026- offlineisbetter
 #
 # Classifier Model
 
 import torch
 from torch import nn
+from transformers import AutoModelForCausalLM
+
+# Classifier head file
+HEAD_PT = "classifier_head.pt"
 
 
 class ClassificationModel(nn.Module):
@@ -80,5 +84,18 @@ class ClassificationModel(nn.Module):
         # Save classifier head
         torch.save(
             self.head.state_dict(),
-            output_dir / "classifier_head.pt",
+            output_dir / HEAD_PT,
         )
+
+    def load(self, output_dir):
+        """
+        Load this model from its checkpoint.
+        """
+        # Load finetuned model
+        self.encoder = AutoModelForCausalLM.from_pretrained(
+            output_dir,
+            local_files_only=True,
+        )
+
+        # Load classifier head
+        self.head.load(torch.load_state_dict(output_dir / HEAD_PT))
