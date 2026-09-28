@@ -93,7 +93,7 @@ class ClassificationModel(nn.Module):
         )
 
         # Save classes
-        with open(output_dir / CLASSES_JSON, "r") as f:
+        with open(output_dir / CLASSES_JSON, "w") as f:
             json.dump(classes, f)
 
     def load(self, output_dir):
