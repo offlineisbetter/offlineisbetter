@@ -11,8 +11,8 @@ import torch
 from torch import nn
 from transformers import AutoTokenizer, AutoModel
 
-# Classifier head file
-HEAD_PT = "classifier_head.pt"
+# Classifier file
+OUTPUT_PT = "classifier.pt"
 
 # Classes JSON
 CLASSES_JSON = "classes.json"
@@ -75,25 +75,26 @@ class ClassificationModel(nn.Module):
         Save this model.
         """
         # Merge and unload
-        merged = self.encoder.merge_and_unload()
+        self.encoder = self.encoder.merge_and_unload()
 
         # Save finetuned model
-        merged.save_pretrained(
+        self.encoder.save_pretrained(
             output_dir,
             safe_serialization=True,
         )
 
-        # Save modeling_lfm2_bidirectional.py
-        src = hf_hub_download(
-            repo_id = base_model_hf_name,
-            filename = "modeling_lfm2_bidirectional.py",
+        # Quantize model
+        model = self.float()
+        qmodel = torch.ao.quantization.quantize_dynamic(
+            model,
+            {torch.nn.Linear},
+            dtype=torch.qint8,
         )
-        shutil.copy(src, output_dir / "modeling_lfm2_bidirectional.py")
 
-        # Save classifier head
+        # Save model
         torch.save(
-            self.head.state_dict(),
-            output_dir / HEAD_PT,
+            model.state_dict(),
+            output_dir / OUTPUT_PT,
         )
 
         # Save classes
@@ -105,11 +106,9 @@ class ClassificationModel(nn.Module):
         """
         Load this model from its checkpoint.
         """
-        # Load finetuned model
         encoder = AutoModel.from_pretrained(
             output_dir,
             local_files_only=True,
-            trust_remote_code=True,
         )
 
         # Load classes
@@ -118,8 +117,8 @@ class ClassificationModel(nn.Module):
 
         model = ClassificationModel(encoder, len(classes))
 
-        # Load classifier head
-        model.head.load_state_dict(torch.load(output_dir / HEAD_PT))
+        # Load checkpoint
+        model.load_state_dict(torch.load(output_dir / OUTPUT_PT))
 
         # Load tokenizer
         tokenizer = AutoTokenizer.from_pretrained(
