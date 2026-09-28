@@ -3,12 +3,17 @@
 #
 # Classifier Model
 
+import json
+
 import torch
 from torch import nn
 from transformers import AutoModelForCausalLM
 
 # Classifier head file
 HEAD_PT = "classifier_head.pt"
+
+# Classes JSON
+CLASSES_JSON = "classes.json"
 
 
 class ClassificationModel(nn.Module):
@@ -68,7 +73,7 @@ class ClassificationModel(nn.Module):
             "logits": logits,
         }
 
-    def save(self, output_dir):
+    def save(self, output_dir, classes):
         """
         Save this model.
         """
@@ -87,6 +92,10 @@ class ClassificationModel(nn.Module):
             output_dir / HEAD_PT,
         )
 
+        # Save classes
+        with open(output_dir / CLASSES_JSON) as f:
+            json.dump(classes, f)
+
     def load(self, output_dir):
         """
         Load this model from its checkpoint.
@@ -99,3 +108,7 @@ class ClassificationModel(nn.Module):
 
         # Load classifier head
         self.head.load(torch.load_state_dict(output_dir / HEAD_PT))
+
+        # Load classes
+        with open(output_dir / CLASSES_JSON) as f:
+            self.classes = json.load(f)
