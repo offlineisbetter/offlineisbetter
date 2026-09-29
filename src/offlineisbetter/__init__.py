@@ -8,10 +8,9 @@ from pathlib import Path
 import sys
 
 from fastapi import FastAPI
-import torch
+import onnxruntime as ort
+from transformers import AutoTokenizer
 import uvicorn
-
-from .models import ClassificationModel
 
 # Global variables
 model = None
@@ -23,6 +22,21 @@ PORT = 8001
 
 # API application
 app = FastAPI()
+
+def load_model(checkpoint):
+    """
+    Load a model, tokenizer, and class dict from checkpoint.
+    """
+    global model
+    global tokenizer
+    global classes
+    model = ort.InferenceSession(checkpoint, providers=["CPUExecutionProvider"])
+    tokenizer = AutoTokenizer.from_pretrained(
+        checkpoint,
+        local_files_only=True,
+    )
+    with open(checkpoint / "classes.json", "r") as f:
+        classes = json.load(f)
 
 @app.post("/offlineisbetter")
 def offlineisbetter(data: dict):
@@ -58,10 +72,7 @@ def main():
         print(f"[port] must be an integer")
 
     # Load model
-    global model
-    global tokenizer
-    global classes
-    model, tokenizer, classes = ClassificationModel.load(Path(checkpoint))
+    load_model(Path(checkpoint))
 
     # Run
     try:
