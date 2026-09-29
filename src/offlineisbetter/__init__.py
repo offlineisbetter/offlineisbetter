@@ -9,6 +9,7 @@ import sys
 
 from fastapi import FastAPI
 import onnxruntime as ort
+import numpy as np
 from transformers import AutoTokenizer
 import uvicorn
 
@@ -30,7 +31,7 @@ def load_model(checkpoint):
     global model
     global tokenizer
     global classes
-    model = ort.InferenceSession(checkpoint, providers=["CPUExecutionProvider"])
+    model = ort.InferenceSession(checkpoint / "classifier_int8.pt", providers=["CPUExecutionProvider"])
     tokenizer = AutoTokenizer.from_pretrained(
         checkpoint,
         local_files_only=True,
@@ -46,13 +47,13 @@ def offlineisbetter(data: dict):
     global model
     global tokenizer
     global classes
-    tok = tokenizer(data["text"], return_tensors="pt")
-    results = model(**tok)
+    tok = tokenizer(data["text"])
+    results = model.run(None, tok)[0]
     c = {v: k for k, v in classes.items()}
     return json.dumps({
-        "label": c[torch.argmax(results["logits"]).item()],
+        "label": c[int(np.argmax(results))],
         "text": data["text"],
-        "logits": [l.item() for l in results["logits"].squeeze()],
+        "logits": [float(f) for f in results.flatten()],
     })
 
 def main():
