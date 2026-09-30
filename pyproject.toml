@@ -7,7 +7,14 @@ authors = [
     { name = "offlineisbetter", email = "dev@offlineisbetter.com" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "fastapi>=0.142.2",
+    "numpy>=2.5.3",
+    "onnxruntime>=1.30.0",
+    "requests>=2.34.2",
+    "tokenizers>=0.23.2",
+    "uvicorn>=0.54.0",
+]
 
 [project.scripts]
 offlineisbetter = "offlineisbetter:main"
