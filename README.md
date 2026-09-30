@@ -1,10 +1,10 @@
 # _offlineisbetter_
 
-runtime for models by _offlineisbetter_.
+building cpu-only text encoder models.
+stop depending on the cloud.
+stop buying expensive gpus.
 
-we believe that you shouldn't give your data to faceless companies, that you deserve to run text models locally, and that you shouldn't need to buy expensive hardware. so we're building _offlineisbetter_.
-
-_offlineisbetter_ models are for _encoding_ tasks: sentiment analysis, text tagging, document retrieval, etc. rather than for _decoding_ tasks like autoregressive generation. we believe that it's wasteful and dangerous to depend on cloud apis for frontier language models to do these simple tasks, and it should be almost mindless to download a model to _use_ it without dealing with runtimes or quantization formats.
+choose to be different. choose to be 🌳 chronically offline 🌳
 
 ## try it yourself
 
@@ -19,6 +19,18 @@ run `offlineisbetter` by selecting a model.
 ```bash
 offlineisbetter 0.0.0.0 8585 offline-sentiment-small
 ```
+
+you can then query the api with a json like so.
+
+```python3
+requests.post(f"http://127.0.0.1:8585/classify", json={"text": "my input text here"}")
+```
+
+## about us
+
+we believe that you shouldn't give your data to faceless companies, that you deserve to run text models locally, and that you shouldn't need to buy expensive hardware. so we're building _offlineisbetter_.
+
+_offlineisbetter_ models are for _encoding_ tasks: sentiment analysis, text tagging, document retrieval, etc. rather than for _decoding_ tasks like autoregressive generation. we believe that it's wasteful and dangerous to depend on cloud apis for frontier language models to do these simple tasks, and it should be almost mindless to download a model to _use_ it without dealing with runtimes or quantization formats.
 
 ## models available
 
