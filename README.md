@@ -23,7 +23,7 @@ offlineisbetter 0.0.0.0 8585 offline-sentiment-small
 you can then query the api with a json like so.
 
 ```python3
-requests.post(f"http://127.0.0.1:8585/classify", json={"text": "my input text here"}")
+requests.post(f"http://127.0.0.1:8585/inference", json={"text": "my input text here"}")
 ```
 
 ## about us

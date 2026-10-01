@@ -76,26 +76,36 @@ def load_model(model_triple):
     with open(checkpoint / "offlineisbetter.json", "r") as f:
         classes = json.load(f)
 
-@app.post("/classify")
+@app.post("/inference")
 def offlineisbetter(data: dict):
     """
-    Run the offlineisbetter classification model.
+    Run the offlineisbetter model.
     """
     global model
     global tokenizer
     global classes
+
+    # Tokenze and encode
     enc = tokenizer.encode(data["text"])
     tok = {
         "input_ids": np.array(enc.ids),
         "attention_mask": np.array(enc.attention_mask),
     }
     results = model.run(None, tok)[0]
-    c = {v: k for k, v in classes.items()}
-    return {
-        "label": c[int(np.argmax(results))],
-        "text": data["text"],
-        "logits": [float(f) for f in results.flatten()],
+
+    # Construct output
+    output = {
+        "result": [float(f) for f in results.flatten()],
     }
+
+    # Get task type
+    task = classes["task"]
+    if task == "classification":
+        c = {v: k for k, v in classes["classes"].items()}
+        output["label"] = c[int(np.argmax(results))]
+        output["text"] = data["text"]
+
+    return output
 
 def main():
     """
